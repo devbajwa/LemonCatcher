@@ -2,7 +2,7 @@
 <html>
 <head>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Erica+One&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&display=swap');
         body {
             display: flex;
             flex-direction: column;
@@ -18,23 +18,82 @@
         h1{
             font-size: 40px;
             text-transform: uppercase;
-            color: yellowgreen;
+            color: #617F1F;
             font-weight: bold;
+            margin: 0;
         }
         #canvas-container {
             background-image: url('assets/ShonkyGameBackgound.png'); /* Replace with the path to your background image */
             background-size: cover;
             position: relative;
+            max-width: 100%;
+        }
+        button{
+            padding: 30px 45px;
+            font-size: 50px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+        button:hover{
+            background: #000;
+        }
+        /* Styles for the modal overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        /* Styles for the modal content */
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Close button style */
+        .close {
+            position: absolute;
+            top: 0px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 40px;
+            font-weight: bold;
+            font-family: 'Erica One', sans-serif;
+            color: #0e769f;
+        }
+        .close:hover{
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <h1>Shokys game</h1>
-    <img id="lemonImg" src="assets/Lemon.png" style="display: none;">
-    <img id="basketImg" src="assets/basket.png" style="display: none;">
-    <div id="canvas-container">
-        <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <!-- Button to open the pop-up -->
+<button id="openButton">🍋</button>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeButton">&times;</span>
+        <h1>Shonkys game</h1>
+        <img id="lemonImg" src="assets/Lemon.png" style="display: none;">
+        <img id="basketImg" src="assets/basket.png" style="display: none;">
+        <div id="canvas-container">
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
+        </div>
     </div>
+</div>
+    
    
 
     <script>
@@ -138,22 +197,56 @@
             // Display the score
             ctx.fillStyle = "black";
             ctx.font = "20px Arial";
-            ctx.fillText('🍋' + score + '/' + maxLemons, 10, 30);
+            /*ctx.fillText('🍋' + score + '/' + maxLemons, 10, 30);*/
             ctx.fillText('🍋' + remainingLemons, 440, 30);
 
             // Check if the game should end
             if (lemonsDropped >= maxLemons) {
                 ctx.fillStyle = "red";
                 ctx.font = "30px Nunito Sans";
-                ctx.fillText("Game Over", canvas.width / 2 - 80, canvas.height / 2);
+                ctx.fillText("Your score: " + score, canvas.width / 2 - 80, canvas.height / 2);
             } else {
                 requestAnimationFrame(draw);
             }
         }
+        // Function to reset the game
+        function resetGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
-        // Start the game
+       /* // Start the game
         createFruits(6); // Initialize with a fruit
+        draw();*/
+
+
+
+        //MODAL
+        // Get references to the modal and buttons
+    var modal = document.getElementById('myModal');
+    var openBtn = document.getElementById('openButton');
+    var closeBtn = document.getElementById('closeButton');
+
+    // Function to open the modal
+    openBtn.addEventListener('click', function() {
+        modal.style.display = 'block';
+        // Start the game
+        createFruits(4); // Initialize with a fruit
         draw();
+    });
+
+    // Function to close the modal
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+        console.log('resetGame')
+        resetGame();
+    });
+
+    // Close the modal when clicking outside the content
+    window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
     </script>
 </body>
 </html>
