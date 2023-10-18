@@ -26,8 +26,8 @@
 </head>
 <body>
     <h1>Shokys game</h1>
-    <img id="lemonImg" src="assets/lemon-50.png" style="display: none;"> <!-- Replace 'lemon.png' with the path to your lemon image -->
-    <img id="basketImg" src="assets/basket-200.png" style="display: none;"> <!-- Replace 'basket.png' with the path to your basket image -->
+    <img id="lemonImg" src="assets/Lemon.png" style="display: none;">
+    <img id="basketImg" src="assets/basket.png" style="display: none;">
     <canvas id="gameCanvas" width="400" height="400"></canvas>
 
     <script>
@@ -40,6 +40,8 @@
         let score = 0;
         let lemonsDropped = 0;
         const maxLemons = 30;
+        let lemonsToDrop = 2; // Number of lemons to drop each time
+        let lemonsDidnotCaught = 0;
         let remainingLemons = maxLemons;
 
         // Basket properties
@@ -60,13 +62,15 @@
         const basketImg = document.getElementById("basketImg");
 
         // Create random fruits
-        function createFruit() {
-            const fruit = {
-                x: Math.random() * (canvas.width - fruitSize),
-                y: 0,
-                speed: Math.random() * 2 + 2,
-            };
-            fruits.push(fruit);
+        function createFruits(count) {
+            for (let i = 0; i < count; i++) {
+                const fruit = {
+                    x: Math.random() * (canvas.width - fruitSize),
+                    y: 0,
+                    speed: Math.random() * 2 + 2,
+                };
+                fruits.push(fruit);
+            }
         }
 
         // Move the basket
@@ -107,7 +111,9 @@
                     score++;
                     lemonsDropped++;
                     remainingLemons--;
-                    createFruit();
+                    createFruits(1); // Drop 2 lemons at a time
+                        
+                    
                 }
 
                 // Remove fruits that go off the screen
@@ -115,7 +121,7 @@
                     fruits.splice(i, 1);
                     lemonsDropped++;
                     remainingLemons--;
-                    createFruit();
+                    createFruits(1);
                 }
             }
 
@@ -139,7 +145,7 @@
         }
 
         // Start the game
-        createFruit(); // Initialize with a fruit
+        createFruits(6); // Initialize with a fruit
         draw();
     </script>
 </body>
