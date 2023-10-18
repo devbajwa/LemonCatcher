@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <img id="lemonImg" src="assets/lemon-50.png" style="display: none;"> <!-- Replace 'lemon.png' with the path to your lemon image -->
+    <img id="basketImg" src="assets/basket-200.png" style="display: none;"> <!-- Replace 'basket.png' with the path to your basket image -->
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Fruit properties
+        const fruitSize = 30;
+        const fruits = [];
+        let score = 0;
+
+        // Basket properties
+        const basketWidth = 60;
+        const basketHeight = 40;
+        let basketX = (canvas.width - basketWidth) / 2;
+
+        // Event listener for basket movement
+        document.addEventListener("keydown", moveBasket);
+
+        // Load the lemon image
+        const lemonImg = document.getElementById("lemonImg");
+
+        // Load the basket image
+        const basketImg = document.getElementById("basketImg");
+
+        // Create random fruits
+        function createFruit() {
+            const fruit = {
+                x: Math.random() * (canvas.width - fruitSize),
+                y: 0,
+                speed: Math.random() * 2 + 2,
+            };
+            fruits.push(fruit);
+        }
+
+        // Move the basket
+        function moveBasket(event) {
+            if (event.key === "ArrowLeft" && basketX > 0) {
+                basketX -= 10;
+            } else if (event.key === "ArrowRight" && basketX + basketWidth < canvas.width) {
+                basketX += 10;
+            }
+        }
+
+        // Draw the game
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw fruits using the lemon image
+            for (let i = 0; i < fruits.length; i++) {
+                const fruit = fruits[i];
+                ctx.drawImage(lemonImg, fruit.x, fruit.y, fruitSize, fruitSize);
+                fruit.y += fruit.speed;
+
+                // Check if the fruit is caught
+                if (
+                    fruit.y + fruitSize > canvas.height - basketHeight &&
+                    fruit.x + fruitSize > basketX &&
+                    fruit.x < basketX + basketWidth
+                ) {
+                    fruits.splice(i, 1);
+                    score++;
+                    createFruit();
+                }
+
+                // Remove fruits that go off the screen
+                if (fruit.y > canvas.height) {
+                    fruits.splice(i, 1);
+                    createFruit();
+                }
+            }
+
+            // Draw the basket
+            ctx.drawImage(basketImg, basketX, canvas.height - basketHeight, basketWidth, basketHeight);
+
+            // Display the score
+            ctx.fillStyle = "black";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+
+            requestAnimationFrame(draw);
+        }
+
+        // Start the game
+        createFruit(); // Initialize with a fruit
+        draw();
+    </script>
+</body>
+</html>
