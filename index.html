@@ -8,12 +8,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 80vh;
             margin: 0;
             font-family: 'Nunito Sans', sans-serif;
         }
         canvas{
-            border: 2px dashed yellowgreen;
             cursor: ew-resize;
         }
         h1{
@@ -22,13 +21,21 @@
             color: yellowgreen;
             font-weight: bold;
         }
+        #canvas-container {
+            background-image: url('assets/ShonkyGameBackgound.png'); /* Replace with the path to your background image */
+            background-size: cover;
+            position: relative;
+        }
     </style>
 </head>
 <body>
     <h1>Shokys game</h1>
     <img id="lemonImg" src="assets/Lemon.png" style="display: none;">
     <img id="basketImg" src="assets/basket.png" style="display: none;">
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="canvas-container">
+        <canvas id="gameCanvas" width="500" height="500"></canvas>
+    </div>
+   
 
     <script>
         const canvas = document.getElementById("gameCanvas");
@@ -126,18 +133,18 @@
             }
 
             // Draw the basket
-            ctx.drawImage(basketImg, basketX, canvas.height - basketHeight, basketWidth, basketHeight);
+            ctx.drawImage(basketImg, basketX, canvas.height - basketHeight-27, basketWidth, basketHeight);
 
             // Display the score
             ctx.fillStyle = "black";
             ctx.font = "20px Arial";
             ctx.fillText('🍋' + score + '/' + maxLemons, 10, 30);
-            ctx.fillText('🍋' + remainingLemons, 340, 30);
+            ctx.fillText('🍋' + remainingLemons, 440, 30);
 
             // Check if the game should end
             if (lemonsDropped >= maxLemons) {
                 ctx.fillStyle = "red";
-                ctx.font = "30px Arial";
+                ctx.font = "30px Nunito Sans";
                 ctx.fillText("Game Over", canvas.width / 2 - 80, canvas.height / 2);
             } else {
                 requestAnimationFrame(draw);
