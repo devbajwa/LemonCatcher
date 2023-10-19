@@ -40,11 +40,11 @@
         #result-screen{
             display: none;
         }
-        #result-screen h2{
+        #result-screen h2, #fact-screen h2{
             font-size: 2rem;
             color: #0e769f;
         }
-        #result-screen h1{
+        #result-screen h1, #fact-screen h1{
             font-size: 3.5rem;
             font-weight: 700;
             color: #0e769f;
@@ -59,6 +59,30 @@
             margin-block: 1rem;
         }
         #getFact:hover{
+            background-color: #000;
+        }
+        /* Fact Screen */
+        #fact-screen{
+            display: none;
+            background: #f3f3f3;
+            padding: 2rem;
+        }
+        #factDesc{
+            padding: 1.5rem;
+            text-transform: none;
+        }
+        #fact-screen #factURL{
+            padding: 30px 45px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            background: #0e769f;
+            color: #fff;
+            font-size: 2rem;
+            margin-block: 1rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+        #fact-screen #factURL:hover{
             background-color: #000;
         }
         /* Styles for the modal overlay */
@@ -121,6 +145,11 @@
             <img src="./assets/lemon_splash.png" alt="Lemon splash">
             <button id="getFact">Get your Shonky's fact</button>
         </div>
+        <div id="fact-screen">
+            <h2 id="factYear"></h2>
+            <h1 id="factDesc"></h1>
+            <a id="factURL" href="#" target="_blank">Read Shonky's article</a>
+        </div>
     </div>
 </div>
     
@@ -177,7 +206,7 @@
             basketWidth = 160;
             basketHeight = 140;
             fruitSize = 60;
-            lemonDroppingSpeed = 12;
+            lemonDroppingSpeed = 102;
             const modalContentDOM = document.querySelector(".modal-content");
             modalContentDOM.style.width = "100%";
             modalContentDOM.style.height= "100%";
@@ -335,11 +364,8 @@
             draw();
         }
 
+        // Result Screen Logic
         function showResultScreen(){
-            
-            console.log("done")
-            // Result Screen Logic
-            
             const canvasContainerDOM = document.querySelector("#canvas-container");
             const resultScreenDOM = document.querySelector("#result-screen");
             const titleDOM = document.querySelector("#title");
@@ -349,6 +375,39 @@
             titleDOM.style.display = "none";
             canvasContainerDOM.style.display = "none";
             resultScreenDOM.style.display = "block";
+            getFactBtn.addEventListener('click', showFactScreen);
+        }
+
+        // Fact Screen Logic
+        function showFactScreen(){
+         // Fetch the JSON data from an external file
+         fetch('facts.json')
+            .then(response => response.json())
+            .then(data => {
+                const randomFact = getRandomFact(data);
+                //document.getElementById('fact').textContent = randomFact;
+                console.log(randomFact);
+                const resultScreenDOM = document.querySelector("#result-screen");
+                resultScreenDOM.style.display = "none";
+                const factScreenDOM = document.querySelector("#fact-screen");
+                factScreenDOM.style.display = "block";
+                const factYearDOM = document.querySelector("#factYear");
+                const factDescDOM = document.querySelector("#factDesc");
+                const factURLDOM = document.querySelector("#factURL");
+                factYearDOM.innerHTML = `Did you know in ${randomFact.year}?`;
+                factDescDOM.innerHTML = `${randomFact.fact}`;
+                factURLDOM.href = randomFact.url;
+            })
+            .catch(error => {
+                console.error('Error fetching or parsing the JSON data:', error);
+            });
+        }
+
+        // Function to select a random fact
+        function getRandomFact(jsonData) {
+            const facts = jsonData.facts;
+            const randomIndex = Math.floor(Math.random() * facts.length);
+            return facts[randomIndex];
         }
         
 
