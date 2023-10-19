@@ -140,10 +140,10 @@
             <canvas id="gameCanvas" width="500" height="500"></canvas>
         </div>
         <div id="result-screen">
-            <h2>Congratulation you have caught</h2>
+            <h2 id="result-message"></h2>
             <h1 id="result-score"></h1>
             <img src="./assets/lemon_splash.png" alt="Lemon splash">
-            <button id="getFact">Get your Shonky's fact</button>
+            <button id="getFact"></button>
         </div>
         <div id="fact-screen">
             <h2 id="factYear"></h2>
@@ -370,12 +370,23 @@
             const resultScreenDOM = document.querySelector("#result-screen");
             const titleDOM = document.querySelector("#title");
             const resultScoreDOM = document.querySelector("#result-score");
+            const resultMessageDOM = document.querySelector("#result-message");
             const getFactBtn = document.querySelector("#getFact");
+            if(score >= 5 ){
+                resultMessageDOM.innerHTML = `Conratulations you have caught`;
+                getFactBtn.innerText = `Get your Shonky's fact`;
+                getFactBtn.addEventListener('click', showFactScreen);
+            }else{
+                resultMessageDOM.innerHTML = `Sorry at least catch 5 lemons to unlock fact`;
+                getFactBtn.innerText = `Try gain?`;
+                getFactBtn.addEventListener('click', ()=> location.reload());
+            }
             resultScoreDOM.innerHTML = `${score} lemons`;
             titleDOM.style.display = "none";
             canvasContainerDOM.style.display = "none";
             resultScreenDOM.style.display = "block";
-            getFactBtn.addEventListener('click', showFactScreen);
+            
+            
         }
 
         // Fact Screen Logic
