@@ -108,39 +108,24 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        function isMobileDevice() {
-            return (typeof window.orientation !== 'undefined') || (navigator.userAgent.indexOf('Mobi') !== -1);
-        }
-
-        function setCanvasWidth() {
-        if (isMobileDevice()) {
-            canvas.width = window.innerWidth;  // Set canvas width to the window's width for mobile devices
-            canvas.height = window.innerHeight;  // Set canvas height to the window's height
-        } else {
-            canvas.width = 500;  // Set a default width for non-mobile devices
-        }
-        }
-
-        // Call the function to set the canvas width when the page loads
-        setCanvasWidth();
-
-        // Add an event listener to adjust canvas width if the window is resized
-        window.addEventListener('resize', setCanvasWidth);
+        // Global state
+        let isGameRunning = false;
 
   
         // Fruit properties
-        const fruitSize = 30;
-        const fruits = [];
+        let fruitSize = 30; // How big the fruit is
+        let fruits = [];
         let score = 0;
         let lemonsDropped = 0;
         const maxLemons = 30;
         let lemonsToDrop = 2; // Number of lemons to drop each time
+        let lemonDroppingSpeed = 2; 
         let lemonsDidnotCaught = 0;
         let remainingLemons = maxLemons;
 
         // Basket properties
-        const basketWidth = 60;
-        const basketHeight = 40;
+        let basketWidth = 60;
+        let basketHeight = 40;
         let basketX = (canvas.width - basketWidth) / 2;
         
 
@@ -160,13 +145,36 @@
         // Load the basket image
         const basketImg = document.getElementById("basketImg");
 
+        function isMobileDevice() {
+            return (typeof window.orientation !== 'undefined') || (navigator.userAgent.indexOf('Mobi') !== -1);
+        }
+
+        function setCanvasWidth() {
+        if (isMobileDevice()) {
+            canvas.width = window.innerWidth;  // Set canvas width to the window's width for mobile devices
+            canvas.height = window.innerHeight - 100;  // Set canvas height to the window's height
+            basketWidth = 160;
+            basketHeight = 140;
+            fruitSize = 60;
+            lemonDroppingSpeed = 8;
+        } else {
+            canvas.width = 500;  // Set a default width for non-mobile devices
+        }
+        }
+
+        // Call the function to set the canvas width when the page loads
+        setCanvasWidth();
+
+        // Add an event listener to adjust canvas width if the window is resized
+        window.addEventListener('resize', setCanvasWidth);
+
         // Create random fruits
         function createFruits(count) {
             for (let i = 0; i < count; i++) {
                 const fruit = {
                     x: Math.random() * (canvas.width - fruitSize),
                     y: 0,
-                    speed: Math.random() * 2 + 2,
+                    speed: Math.random() * lemonDroppingSpeed + 2,
                 };
                 fruits.push(fruit);
             }
@@ -205,14 +213,14 @@
                 // Calculate the distance moved since the last touchmove event
                 const swipeDistance = touchMoveX - previousTouchX;
 
-                // Adjust the catcher's position based on the swipe distance
-                catcherX += swipeDistance;
+                // Adjust the basket's position based on the swipe distance
+                basketX += swipeDistance;
 
-                // Ensure the catcher stays within the canvas boundaries
-                if (catcherX < 0) {
-                    catcherX = 0;
-                } else if (catcherX + catcherWidth > canvas.width) {
-                    catcherX = canvas.width - catcherWidth;
+                // Ensure the basket stays within the canvas boundaries
+                if (basketX < 0) {
+                    basketX = 0;
+                } else if (basketX + basketWidth > canvas.width) {
+                    basketX = canvas.width - basketWidth;
                 }
 
                 previousTouchX = touchMoveX;
@@ -234,6 +242,7 @@
                 const fruit = fruits[i];
                 ctx.drawImage(lemonImg, fruit.x, fruit.y, fruitSize, fruitSize);
                 fruit.y += fruit.speed;
+                console.log(fruit.y);
 
                 // Check if the fruit is caught
                 if (
@@ -258,35 +267,48 @@
                     createFruits(1);
                 }
             }
-
+            if (isMobileDevice()) {
+            // Draw the basket
+            ctx.drawImage(basketImg, basketX, canvas.height - basketHeight-97, basketWidth, basketHeight);
+            ctx.font = "60px Arial";
+            ctx.fillStyle = "black";
+            ctx.fillText('🍋' + lemonsDropped, canvas.width - 200, 70);
+            }else{
             // Draw the basket
             ctx.drawImage(basketImg, basketX, canvas.height - basketHeight-27, basketWidth, basketHeight);
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.fillText('🍋' + lemonsDropped, 440, 30);
+            }
 
             // Display the score
-            ctx.fillStyle = "black";
-            ctx.font = "20px Arial";
             /*ctx.fillText('🍋' + score + '/' + maxLemons, 10, 30);*/
-            ctx.fillText('🍋' + remainingLemons, 440, 30);
 
             // Check if the game should end
             if (lemonsDropped >= maxLemons) {
                 ctx.fillStyle = "red";
                 ctx.font = "30px Nunito Sans";
                 ctx.fillText("Your score: " + score, canvas.width / 2 - 80, canvas.height / 2);
-            } else {
+            } else if(isGameRunning) {
                 requestAnimationFrame(draw);
             }
         }
         // Function to reset the game
         function resetGame() {
-            let score = 0;
-            let lemonsDropped = 0;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            score = 0;
+            lemonsDropped = 0;
+            fruits = [];
+            isGameRunning = false;
         }
 
-       /* // Start the game
-        createFruits(6); // Initialize with a fruit
-        draw();*/
+        // Start the game
+        function startGame(){
+            isGameRunning = true;
+            createFruits(4); // Initialize with a fruit
+            draw();
+        }
+        
 
 
 
@@ -300,14 +322,12 @@
     openBtn.addEventListener('click', function() {
         modal.style.display = 'block';
         // Start the game
-        createFruits(4); // Initialize with a fruit
-        draw();
+        startGame();
     });
 
     // Function to close the modal
     closeBtn.addEventListener('click', function() {
         modal.style.display = 'none';
-        console.log('resetGame')
         resetGame();
     });
 
@@ -315,6 +335,7 @@
     window.addEventListener('click', function(event) {
         if (event.target == modal) {
             modal.style.display = 'none';
+            resetGame();
         }
     });
     </script>
