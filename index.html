@@ -37,6 +37,9 @@
         button:hover{
             background: #000;
         }
+        #result-screen{
+            display: none;
+        }
         /* Styles for the modal overlay */
         .modal {
             display: none;
@@ -85,11 +88,17 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" id="closeButton">&times;</span>
-        <h1>Shonkys game</h1>
+        <h1 id="title">Shonkys game</h1>
         <img id="lemonImg" src="assets/Lemon.png" style="display: none;">
         <img id="basketImg" src="assets/basket.png" style="display: none;">
         <div id="canvas-container">
             <canvas id="gameCanvas" width="500" height="500"></canvas>
+        </div>
+        <div id="result-screen">
+            <h2>Congratulation you have caught</h2>
+            <h1 id="result-score"></h1>
+            <img src="./assets/lemon_splash.png" alt="Lemon splash">
+            <button id="getFact">Get your Shonky's fact</button>
         </div>
     </div>
 </div>
@@ -99,7 +108,26 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        function isMobileDevice() {
+            return (typeof window.orientation !== 'undefined') || (navigator.userAgent.indexOf('Mobi') !== -1);
+        }
 
+        function setCanvasWidth() {
+        if (isMobileDevice()) {
+            canvas.width = window.innerWidth;  // Set canvas width to the window's width for mobile devices
+            canvas.height = window.innerHeight;  // Set canvas height to the window's height
+        } else {
+            canvas.width = 500;  // Set a default width for non-mobile devices
+        }
+        }
+
+        // Call the function to set the canvas width when the page loads
+        setCanvasWidth();
+
+        // Add an event listener to adjust canvas width if the window is resized
+        window.addEventListener('resize', setCanvasWidth);
+
+  
         // Fruit properties
         const fruitSize = 30;
         const fruits = [];
@@ -114,12 +142,17 @@
         const basketWidth = 60;
         const basketHeight = 40;
         let basketX = (canvas.width - basketWidth) / 2;
+        
 
         // Event listener for basket movement
         document.addEventListener("keydown", moveBasket);
         document.addEventListener("mousemove", moveBasketWithMouse);
         canvas.addEventListener("mouseover", () => (isMouseOverCanvas = true));
         canvas.addEventListener("mouseout", () => (isMouseOverCanvas = false));
+        // Add touch event listeners
+        canvas.addEventListener("touchstart", handleTouchStart);
+        canvas.addEventListener("touchmove", handleTouchMove);
+        canvas.addEventListener("touchend", handleTouchEnd);
 
         // Load the lemon image
         const lemonImg = document.getElementById("lemonImg");
@@ -156,6 +189,41 @@
                 basketX = Math.min(Math.max(mouseX - basketWidth / 2, 0), canvas.width - basketWidth);
             }
         }
+
+        // Function to handle touchstart event
+        function handleTouchStart(event) {
+            touchStartX = event.touches[0].clientX;
+            previousTouchX = touchStartX;
+            isSwiping = true;
+        }
+
+        // Function to handle touchmove event
+        function handleTouchMove(event) {
+            if (isSwiping) {
+                touchMoveX = event.touches[0].clientX;
+
+                // Calculate the distance moved since the last touchmove event
+                const swipeDistance = touchMoveX - previousTouchX;
+
+                // Adjust the catcher's position based on the swipe distance
+                catcherX += swipeDistance;
+
+                // Ensure the catcher stays within the canvas boundaries
+                if (catcherX < 0) {
+                    catcherX = 0;
+                } else if (catcherX + catcherWidth > canvas.width) {
+                    catcherX = canvas.width - catcherWidth;
+                }
+
+                previousTouchX = touchMoveX;
+            }
+        }
+
+        // Function to handle touchend event
+        function handleTouchEnd() {
+            isSwiping = false;
+        }
+
 
         // Draw the game
         function draw() {
@@ -211,6 +279,8 @@
         }
         // Function to reset the game
         function resetGame() {
+            let score = 0;
+            let lemonsDropped = 0;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
