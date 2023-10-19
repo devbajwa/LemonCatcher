@@ -72,7 +72,7 @@
             text-transform: none;
         }
         #fact-screen #factURL{
-            padding: 30px 45px;
+            padding: 20px 35px;
             cursor: pointer;
             transition: all 0.15s ease-in-out;
             background: #0e769f;
@@ -119,9 +119,11 @@
             font-weight: bold;
             font-family: 'Erica One', sans-serif;
             color: #0e769f;
+            transition: rotate 1.2s ease-in;
         }
         .close:hover{
             color: #333;
+            transform: rotate(5deg);
         }
     </style>
 </head>
@@ -146,8 +148,9 @@
             <button id="getFact"></button>
         </div>
         <div id="fact-screen">
+            <div id="awardLevel"></div>
             <h2 id="factYear"></h2>
-            <h1 id="factDesc"></h1>
+            <h3 id="factDesc"></h3>
             <a id="factURL" href="#" target="_blank">Read Shonky's article</a>
         </div>
     </div>
@@ -355,6 +358,14 @@
             lemonsDropped = 0;
             fruits = [];
             isGameRunning = false;
+            const canvasContainerDOM = document.querySelector("#canvas-container");
+            const resultScreenDOM = document.querySelector("#result-screen");
+            const titleDOM = document.querySelector("#title");
+            const factScreenDOM = document.querySelector("#fact-screen");
+            factScreenDOM.style.display = "none";
+            canvasContainerDOM.style.display = "block";
+            resultScreenDOM.style.display = "none";
+            titleDOM.style.display = "block";
         }
 
         // Start the game
@@ -372,12 +383,12 @@
             const resultScoreDOM = document.querySelector("#result-score");
             const resultMessageDOM = document.querySelector("#result-message");
             const getFactBtn = document.querySelector("#getFact");
-            if(score >= 5 ){
+            if(score >= 20 ){
                 resultMessageDOM.innerHTML = `Conratulations you have caught`;
                 getFactBtn.innerText = `Get your Shonky's fact`;
                 getFactBtn.addEventListener('click', showFactScreen);
             }else{
-                resultMessageDOM.innerHTML = `Sorry at least catch 5 lemons to unlock fact`;
+                resultMessageDOM.innerHTML = `Sorry at least catch 20 lemons to unlock fact`;
                 getFactBtn.innerText = `Try gain?`;
                 getFactBtn.addEventListener('click', ()=> location.reload());
             }
@@ -386,18 +397,44 @@
             canvasContainerDOM.style.display = "none";
             resultScreenDOM.style.display = "block";
             
-            
         }
 
         // Fact Screen Logic
         function showFactScreen(){
+            const url = `https://uat.devtest.choice.com.au/api/sitecore/DecisionTreeAPI/GetAward?noOfCatch=${score}&category=test`;
+
+fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data); // Response data from API
+                const randomFact = data;
+                const resultScreenDOM = document.querySelector("#result-screen");
+                resultScreenDOM.style.display = "none";
+                const factScreenDOM = document.querySelector("#fact-screen");
+                factScreenDOM.style.display = "block";
+                const awardLevel = document.querySelector("#awardLevel");
+                const factYearDOM = document.querySelector("#factYear");
+                const factDescDOM = document.querySelector("#factDesc");
+                const factURLDOM = document.querySelector("#factURL");
+                awardLevel.innerText = `Award Level: ${randomFact.award}`;
+                factYearDOM.innerHTML = `Did you know in ${randomFact.year}?`;
+                factDescDOM.innerHTML = `${randomFact.fact}`;
+                factURLDOM.href = randomFact.url;
+    })
+    .catch(error => {
+        console.error("Fetch error:", error);
+    });
+/*
          // Fetch the JSON data from an external file
          fetch('facts.json')
             .then(response => response.json())
             .then(data => {
                 const randomFact = getRandomFact(data);
-                //document.getElementById('fact').textContent = randomFact;
-                console.log(randomFact);
                 const resultScreenDOM = document.querySelector("#result-screen");
                 resultScreenDOM.style.display = "none";
                 const factScreenDOM = document.querySelector("#fact-screen");
@@ -412,6 +449,7 @@
             .catch(error => {
                 console.error('Error fetching or parsing the JSON data:', error);
             });
+            */
         }
 
         // Function to select a random fact
