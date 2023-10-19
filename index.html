@@ -2,7 +2,7 @@
 <html>
 <head>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Erica+One&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Electrolize&family=Erica+One&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&display=swap');
         body {
             display: flex;
             flex-direction: column;
@@ -21,6 +21,7 @@
             color: #617F1F;
             font-weight: bold;
             margin: 0;
+            font-family: 'Electrolize', sans-serif;
         }
         #canvas-container {
             background-image: url('assets/ShonkyGameBackgound.png'); /* Replace with the path to your background image */
@@ -39,6 +40,11 @@
         }
         #result-screen{
             display: none;
+        }
+        #awardLevel{
+            font-family: 'Electrolize', sans-serif;
+            text-transform: capitalize;
+            font-size: 1.2rem;
         }
         #result-screen h2, #fact-screen h2{
             font-size: 2rem;
@@ -401,18 +407,40 @@
 
         // Fact Screen Logic
         function showFactScreen(){
+            /*
             const url = `https://uat.devtest.choice.com.au/api/sitecore/DecisionTreeAPI/GetAward?noOfCatch=${score}&category=test`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Response data from API
+                            const randomFact = data;
+                            const resultScreenDOM = document.querySelector("#result-screen");
+                            resultScreenDOM.style.display = "none";
+                            const factScreenDOM = document.querySelector("#fact-screen");
+                            factScreenDOM.style.display = "block";
+                            const awardLevel = document.querySelector("#awardLevel");
+                            const factYearDOM = document.querySelector("#factYear");
+                            const factDescDOM = document.querySelector("#factDesc");
+                            const factURLDOM = document.querySelector("#factURL");
+                            awardLevel.innerText = `Award Level: ${randomFact.award}`;
+                            factYearDOM.innerHTML = `Did you know in ${randomFact.year}?`;
+                            factDescDOM.innerHTML = `${randomFact.fact}`;
+                            factURLDOM.href = randomFact.url;
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                });*/
 
-fetch(url)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data); // Response data from API
-                const randomFact = data;
+         // Fetch the JSON data from an external file
+         fetch('facts.json')
+            .then(response => response.json())
+            .then(data => {
+                const randomFact = getRandomFact(data);
                 const resultScreenDOM = document.querySelector("#result-screen");
                 resultScreenDOM.style.display = "none";
                 const factScreenDOM = document.querySelector("#fact-screen");
@@ -425,31 +453,11 @@ fetch(url)
                 factYearDOM.innerHTML = `Did you know in ${randomFact.year}?`;
                 factDescDOM.innerHTML = `${randomFact.fact}`;
                 factURLDOM.href = randomFact.url;
-    })
-    .catch(error => {
-        console.error("Fetch error:", error);
-    });
-/*
-         // Fetch the JSON data from an external file
-         fetch('facts.json')
-            .then(response => response.json())
-            .then(data => {
-                const randomFact = getRandomFact(data);
-                const resultScreenDOM = document.querySelector("#result-screen");
-                resultScreenDOM.style.display = "none";
-                const factScreenDOM = document.querySelector("#fact-screen");
-                factScreenDOM.style.display = "block";
-                const factYearDOM = document.querySelector("#factYear");
-                const factDescDOM = document.querySelector("#factDesc");
-                const factURLDOM = document.querySelector("#factURL");
-                factYearDOM.innerHTML = `Did you know in ${randomFact.year}?`;
-                factDescDOM.innerHTML = `${randomFact.fact}`;
-                factURLDOM.href = randomFact.url;
             })
             .catch(error => {
                 console.error('Error fetching or parsing the JSON data:', error);
             });
-            */
+            
         }
 
         // Function to select a random fact
