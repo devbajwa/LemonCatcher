@@ -40,6 +40,27 @@
         #result-screen{
             display: none;
         }
+        #result-screen h2{
+            font-size: 2rem;
+            color: #0e769f;
+        }
+        #result-screen h1{
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #0e769f;
+        }
+        #result-screen img{
+            max-width: 100%;
+        }
+        #getFact{
+            background: #0e769f;
+            color: #fff;
+            font-size: 2rem;
+            margin-block: 1rem;
+        }
+        #getFact:hover{
+            background-color: #000;
+        }
         /* Styles for the modal overlay */
         .modal {
             display: none;
@@ -119,7 +140,7 @@
         let lemonsDropped = 0;
         const maxLemons = 30;
         let lemonsToDrop = 2; // Number of lemons to drop each time
-        let lemonDroppingSpeed = 2; 
+        let lemonDroppingSpeed = 3; 
         let lemonsDidnotCaught = 0;
         let remainingLemons = maxLemons;
 
@@ -156,7 +177,10 @@
             basketWidth = 160;
             basketHeight = 140;
             fruitSize = 60;
-            lemonDroppingSpeed = 8;
+            lemonDroppingSpeed = 12;
+            const modalContentDOM = document.querySelector(".modal-content");
+            modalContentDOM.style.width = "100%";
+            modalContentDOM.style.height= "100%";
         } else {
             canvas.width = 500;  // Set a default width for non-mobile devices
         }
@@ -286,9 +310,11 @@
 
             // Check if the game should end
             if (lemonsDropped >= maxLemons) {
-                ctx.fillStyle = "red";
-                ctx.font = "30px Nunito Sans";
-                ctx.fillText("Your score: " + score, canvas.width / 2 - 80, canvas.height / 2);
+                // ctx.fillStyle = "red";
+                // ctx.font = "30px Nunito Sans";
+                // ctx.fillText("Your score: " + score, canvas.width / 2 - 80, canvas.height / 2);
+                showResultScreen();
+                isGameRunning = false;
             } else if(isGameRunning) {
                 requestAnimationFrame(draw);
             }
@@ -308,8 +334,23 @@
             createFruits(4); // Initialize with a fruit
             draw();
         }
-        
 
+        function showResultScreen(){
+            
+            console.log("done")
+            // Result Screen Logic
+            
+            const canvasContainerDOM = document.querySelector("#canvas-container");
+            const resultScreenDOM = document.querySelector("#result-screen");
+            const titleDOM = document.querySelector("#title");
+            const resultScoreDOM = document.querySelector("#result-score");
+            const getFactBtn = document.querySelector("#getFact");
+            resultScoreDOM.innerHTML = `${score} lemons`;
+            titleDOM.style.display = "none";
+            canvasContainerDOM.style.display = "none";
+            resultScreenDOM.style.display = "block";
+        }
+        
 
 
         //MODAL
